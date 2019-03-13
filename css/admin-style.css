@@ -1,0 +1,89 @@
+.gbl_content_wrapper{ display:table; width:100%;}
+.gbl_content_wrapper .left{ display:table-cell; float:none; vertical-align:top; }
+.gbl_content_wrapper .right{ display:table-cell; float:none; vertical-align:top; width:261px; padding:0 0 0 20px; }
+@media screen and (max-width: 1200px) {
+  .gbl_content_wrapper .left{ float:left; width:100%; }
+  .gbl_content_wrapper .right{ float:left; width:100%; padding:20px 0 0 0; }
+}
+
+.gbl_content_wrapper {
+  max-width: 1200px;
+}
+.gbl_content_wrapper a {
+  text-decoration: none;
+}
+.gbl_section {
+  padding-bottom: 20px;
+}
+.gbl_section_content {
+  display: flex;
+}
+.gbl_form_input {
+  min-width: 400px;
+  margin-right: 40px;
+}
+.gbl_input_group {
+  display: flex;
+}
+.gbl_input {
+  padding-right: 10px;
+}
+.gbl_input input, .gbl_input select {
+  width: 100%;
+}
+.gbl_label {
+  font-size: 14px;
+  font-weight: 600;
+  color: #23282d;
+  padding-bottom: 6px;
+}
+.gbl_notes {
+  flex: auto;
+}
+.gbl_notes > p {
+  margin-top: 0px;
+  margin-bottom: 6px;
+}
+.gbl_advertisers {
+  width: 100%;
+}
+.gbl_table {
+  border: 1px solid #ccc;
+  background-color: #fffafa;
+}
+.gbl_table_desc {
+  padding: 4px 8px;
+}
+.gbl_table_header .gbl_col {
+  font-weight: 600;
+  border-bottom: 2px solid #ccc;
+  background: #ddd;
+}
+.gbl_table_header, .gbl_table_body {
+  display: block;
+}
+.gbl_row {
+  display: flex;
+  width: 100%;
+}
+.gbl_col {
+  padding: 4px 8px;
+  display: inline-block;
+  box-sizing: border-box;
+}
+.gbl_col_1 {
+  width: 30%;
+}
+.gbl_col_2 {
+  width: 70%;
+}
+select[name='advertise'] {
+  min-width: 300px;
+}
+#gbl_advertisers_input:not([count='0']) .gbl_table_desc {
+  display: none;
+}
+.gbl_remove_link {
+  float: right;
+  color: #ff0000;
+}

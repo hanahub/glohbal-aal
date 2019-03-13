@@ -1,0 +1,5 @@
+
+/* Ensure that extlink-icon's appear at their initial size */
+img.extlink-icon {
+    width: initial !important;
+}
