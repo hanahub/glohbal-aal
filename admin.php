@@ -42,8 +42,8 @@ function register_gbl_settings() {
 }
 
 function gbl_plugin_menu() {
-	add_options_page('External & Affiliate Links Processor, rel=nofollow, open in new window, favicon',
-					 'External & Affiliate Links Processor',
+	add_options_page('Glohbal Affiliate, rel=nofollow, open in new window, favicon',
+					 'Glohbal Affiliate',
 					 'manage_options', 'gbl_option_page', 'gbl_option_page_fn');
 }
 
@@ -67,14 +67,18 @@ gbl_get_advertisers();
 function gbl_option_page_fn() {
   $gbl_link_id = get_option('gbl_link_id');
   $gbl_advertisers = get_option('gbl_advertisers');
-  echo "XXXXX" . $gbl_advertisers;
-  print_r($gbl_advertisers);
-  echo "YYYY";
+  
+  if (empty($gbl_advertisers['name']) || count($gbl_advertisers['name']) == 1) {
+    $gbl_ads_count = 0;
+  } else {
+    $gbl_ads_count = count($gbl_advertisers['name']);
+  }
+
   $ads = gbl_get_advertisers();
   
 	?>
 	<div class="wrap">
-		<h2>Glohbal Automatic Affiliate Links Plugin for Amazon & Rakuten (LinkShare) platforms</h2>
+		<h2>Glohbal Affiliate linking for Linkshare/Rakuten network</h2>
 		<div class="gbl_content_wrapper">
       
       <form method="post" action="options.php">						
@@ -123,11 +127,11 @@ function gbl_option_page_fn() {
                 <div class="gbl_table_header">
                   <div class="gbl_row">
                     <div class="gbl_col gbl_col_1">Advertiser Name</div>
-                    <div class="gbl_col gbl_col_2">Test Link</div>
+                    <div class="gbl_col gbl_col_2">Advertiser URL home page</div>
                   </div>
                 </div>
-                <div class="gbl_table_body" id="gbl_advertisers_input" count="<?php echo count($gbl_advertisers["name"]); ?>">
-                  <?php if (count($gbl_advertisers["name"]) > 0) : ?>
+                <div class="gbl_table_body" id="gbl_advertisers_input" count="<?php echo $gbl_ads_count; ?>">
+                  <?php if ($gbl_ads_count > 0) : ?>
                   <?php foreach ($gbl_advertisers["name"] as $key => $name) :
                       $url = $gbl_advertisers["url"][$key];
                       $mid = $gbl_advertisers["mid"][$key];

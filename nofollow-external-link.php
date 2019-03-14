@@ -4,7 +4,7 @@
  Plugin Name: Glohbal Automatic Affiliate Links Plugin for Amazon & Rakuten (LinkShare) platforms
  Plugin URI: https://davidherron.com/content/external-links-nofollow-favicon-open-external-window-etc-wordpress
  Description: Process outbound (external) links in content, optionally adding affiliate link attributes, rel=nofollow or target=_blank attributes, and optionally adding icons.
- Version: 1.0.0
+ Version: 1.0.2
  Author: Valentin Marinov
  Author URI: https://github.com/shopthefeed
  slug: external-links-nofollow
@@ -33,6 +33,10 @@ define("GBLURL", plugin_dir_url(__FILE__));
 
 require GBLDIR.'AffiliateLinkProcessor/Processor.php';
 
+$gbl_links = array(
+	'rakuten' => 'http://click.linksynergy.com/deeplink'
+);
+
 if (is_admin()) {
 	require_once GBLDIR.'admin.php';
 }
@@ -50,33 +54,19 @@ add_filter('the_content', 'gbl_urlparse2', 99);
 
 function gbl_urlparse2($content) {
 
-	$affprocessor = gbl_init_affprocessor();
+	// $affprocessor = gbl_init_affprocessor();
+	$gbl_link_id = get_option('gbl_link_id');
+	$gbl_advertisers = get_option('gbl_advertisers');
+
+	if (empty($gbl_link_id) || empty($gbl_advertisers)) return $content;
 
 	$ownDomain = $_SERVER['HTTP_HOST'];
-
-	// whitelist
-	$white_list_domains_list = array();
-	if (get_option('gbl_whitelist_domains')!='') {
-		$white_list_domains_list = explode(",",get_option('gbl_whitelist_domains'));
-	}
-
-	// blacklist
-	$black_list_domains_list = array();
-	if (get_option('gbl_blacklist_domains')!='') {
-		$black_list_domains_list = explode(",",get_option('gbl_blacklist_domains'));
-	}
-
-	$gbl_icons_before_after = get_option('gbl_icons_before_after');
-	$gbl_target_blank = get_option('gbl_target_blank');
-	$gbl_show_extlink = get_option('gbl_show_extlink');
-	$gbl_show_favicon = get_option('gbl_show_favicon');
 
 	try {
 		$html = new DOMDocument(null, 'UTF-8');
 		@$html->loadHTML('<meta http-equiv="content-type" content="text/html; charset=utf-8">' . $content);
 
 		foreach ($html->getElementsByTagName('a') as $a) {
-
 			// Skip if there's no href=
 			$url = $a->attributes->getNamedItem('href');
 			if (!$url) {
@@ -100,123 +90,54 @@ function gbl_urlparse2($content) {
 				$hasImages = true;
 			}
 
-			// true means add nofollow, false means not (is in whitelist)
-			$domainNoFollow = true;
-
-			if (count($white_list_domains_list) > 0) {
-				$white_list_domains_list = array_filter($white_list_domains_list);
-				foreach ($white_list_domains_list as $domain) {
-					$domain = trim($domain);
-					if ($domain != '') {
-						$domainCheck = gbl_domainEndsWith($urlParts['host'], $domain);
-						if ($domainCheck === false) {
-							continue;
-						} else {
-							$domainNoFollow = false;
-							break;
-						}
-					}
-				}
-			}
-
-			// false means not in BlackList, true means in BlackList & add nofollow
-			$domainInBlackList = false;
-			$noBlackList = false;
-			if (count($black_list_domains_list) > 0) {
-				$black_list_domains_list = array_filter($black_list_domains_list);
-				foreach ($black_list_domains_list as $domain) {
-					$domain = trim($domain);
-					if ($domain != '') {
-						$domainCheck = gbl_domainEndsWith($urlParts['host'], $domain);
-						if($domainCheck === false) {
-							continue;
-						} else {
-							$domainInBlackList = true;
-							$domainNoFollow = true;
-							break;
-						}
-					}
-				}
-				if (!$domainInBlackList) $domainNoFollow = false;
-			} else {
-				$noBlackList = true;
-			}
-
 			// Add rel=nofollow
-			if ($domainNoFollow || $domainInBlackList) {
-				$a->setAttribute('rel', 'nofollow');
-			}
-
-			// $a->setAttribute('data-domain-no-follow', $domainNoFollow ? "true" : "false");
-			// $a->setAttribute('data-domain-in-black-list', $domainInBlackList ? "true" : "false");
-
+			$a->setAttribute('rel', 'nofollow');
+			
 			// Add target=_blank if there's no target=
 			$curtarget = $a->getAttribute('target');
-			if (!empty($gbl_target_blank)
-			 && $gbl_target_blank === "_blank"
-			 && (!isset($curtarget) || $curtarget == '')
-			) {
+			if (!isset($curtarget) || $curtarget == '') {
 				$a->setAttribute('target', '_blank');
 			}
 
-			// Add the favicon
-			if (!$hasImages
-			 && !empty($gbl_show_favicon)
-			 && $gbl_show_favicon === "show"
-			 && !$a->attributes->getNamedItem('data-no-favicon')
-			) {
-				$img = $html->createElement('img');
-				$img->setAttribute('class', 'extlink-icon');
-				$img->setAttribute('src', '//www.google.com/s2/favicons?domain=' . $urlParts['host']);
-				$img->setAttribute('style', 'display: inline-block; padding-right: 4px;');
-				if (empty($gbl_icons_before_after)
-				 || (!empty($gbl_icons_before_after) && $gbl_icons_before_after === "before")
-				) {
-					$a->insertBefore($img, $a->firstChild);
-				} else {
-					$a->appendChild($img);
-				}
-			}
-
-			// Add external link icon
-			if (!empty($gbl_show_extlink)
-			 && $gbl_show_extlink === "show"
-			) {
-				$img = $html->createElement('img');
-				$img->setAttribute('class', 'extlink-icon');
-				$img->setAttribute('src', esc_url(plugins_url('images/extlink.png', __FILE__)));
-				if (empty($gbl_icons_before_after)
-				 || (!empty($gbl_icons_before_after) && $gbl_icons_before_after === "before")
-				) {
-					$a->insertBefore($img, $a->firstChild);
-				} else {
-					$a->appendChild($img);
-				}
-			}
-
 			// Process for affiliate links
-			$newurl = $affprocessor->process($url->textContent);
+			// $newurl = $affprocessor->process($url->textContent);
+
+			$newurl = gbl_process($url->textContent, $gbl_link_id, $gbl_advertisers);
 			if ($newurl !== $url->textContent) {
 				$a->setAttribute('href', $newurl);
-				// nofollow is required by Google et al on paid links
-				// noskim tells skimlinks.com to not rewrite
-				// norewrite tells viglink.com to not rewrite
 				$a->setAttribute('rel', 'nofollow noskim norewrite');
 			}
 		}
 
-        // loadHTML adds spurious DOCTYPE, html and body tags. That causes problems
-        // when it arrives as aprt of the resulting HTML.
-        // There is discussion here:  http://php.net/manual/en/domdocument.savehtml.php
-        //
-        // The cleanest way to remove them is first serialize the BODY tag to HTML.
-        // That leaves a BODY tag wrapping the HTML snippet, which is
-        // removed by the str_replace call.
-        return str_replace(array('<body>', '</body>'), '', $html->saveHTML($html->getElementsByTagName('body')->item(0)));
+  	return str_replace(array('<body>', '</body>'), '', $html->saveHTML($html->getElementsByTagName('body')->item(0)));
 
 	} catch (Exception $e) {
 		return $content;
 	}
+}
+
+function gbl_process($url, $gbl_link_id, $gbl_advertisers) {
+	global $gbl_links;
+
+	foreach ($gbl_advertisers["url"] as $k => $u) {
+		$urlParts = parse_url($u);
+		if (!$urlParts || empty($urlParts['host']) || !empty($urlParts['fragment'])) {
+			continue;
+		}
+
+		if (stripos($url, $urlParts['host']) !== false) {
+			$ad_mid = $gbl_advertisers["mid"][$k];
+
+			$newurl = "{$gbl_links['rakuten']}?id={$gbl_link_id}&mid={$ad_mid}&murl={$url}";
+			return $newurl;
+		}
+	}
+
+	return $url;
+	
+	// 	[LINK]mytheresa.com/en-de/designers/bottega-veneta.html?block=4
+	// into 
+	// [LINK2]http://click.linksynergy.com/deeplink?id=RtbW/HMWeFA&mid=43172&murl=https%3A%2F%2Fwww.mytheresa.com%2Fen-de%2Fdesigners%2Fbottega-veneta.html%3Fblock%3D4
 }
 
 function gbl_init_affprocessor() {

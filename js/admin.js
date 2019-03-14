@@ -8,6 +8,13 @@ jQuery(function($) {
 		return added;
 	}
 
+	$(document).on('click', '.gbl_remove_link', function(e) {
+		$(this).closest('.gbl_row').remove();
+		let count = $("#gbl_advertisers_input .gbl_advertiser_name").length;
+		$("#gbl_advertisers_input").attr('count', count);
+	});
+	
+
 	$("#gbl_add_advertiser").click(function(e) {
 		let $item = $('#advertiser_list');
 		let name = $item.val();
@@ -17,7 +24,7 @@ jQuery(function($) {
 		if (!gbl_advertiser_added(name)) {
 			let ad = '<div class="gbl_row"> \
 							<div class="gbl_col gbl_col_1 gbl_advertiser_name">' + name + '</div> \
-							<div class="gbl_col gbl_col_2"><a target="_blank" mid="' + mid + '" href="' + url + '">' + url + '</a></div>';						
+							<div class="gbl_col gbl_col_2"><a target="_blank" mid="' + mid + '" href="' + url + '">' + url + '</a><a class="gbl_remove_link" href="#remove">Remove</a></div>';
 			ad += '<input type="hidden" name="gbl_advertisers[name][]" value="' + name + '" />';
 			ad += '<input type="hidden" name="gbl_advertisers[url][]" value="' + url + '" />';
 			ad += '<input type="hidden" name="gbl_advertisers[mid][]" value="' + mid + '" />';
