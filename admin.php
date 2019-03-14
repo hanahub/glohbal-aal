@@ -14,17 +14,6 @@ add_action('admin_init', 'gbl_admin_init');
 function gbl_admin_sidebar() {
 }
 
-
-add_filter('plugin_row_meta', 'gbl_row_meta', 10, 2);
-
-function gbl_row_meta($links, $file) {
-	if (strpos($file, 'nofollow-external-link.php') !== false) {
-		$links[] = '<a href="https://www.paypal.com/cgi-bin/webscr?cmd=_s-xclick&hosted_button_id=NJUEG56USPC72">Donate</a>';
-		$links[] = '<a href="https://github.com/robogeek/wp-nofollow">Contribute</a>';
-	}
-	return $links;
-}
-
 function gbl_admin_style() {
 	global $pluginsURI;
 	wp_register_style('gbl_admin_css', esc_url(plugins_url( 'css/admin-style.css', __FILE__ )) , false, '1.0');

@@ -1,9 +1,9 @@
 <?php
 /*
 
- Plugin Name: Glohbal Automatic Affiliate Links Plugin for Amazon & Rakuten (LinkShare) platforms
- Plugin URI: https://davidherron.com/content/external-links-nofollow-favicon-open-external-window-etc-wordpress
- Description: Process outbound (external) links in content, optionally adding affiliate link attributes, rel=nofollow or target=_blank attributes, and optionally adding icons.
+ Plugin Name: Glohbal Affiliate linking for Linkshare/Rakuten network
+ Plugin URI: https://github.com/shopthefeed
+ Description: Process outbound (external) links in content, optionally adding affiliate link attributes, rel=nofollow or target=_blank attributes.
  Version: 1.0.2
  Author: Valentin Marinov
  Author URI: https://github.com/shopthefeed
